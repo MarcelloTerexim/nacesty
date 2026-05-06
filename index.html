@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#06b6d4">
+    <title>Moje výlety · Na cesty</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="images/logo.png">
+</head>
+<body data-page="home">
+
+<header class="nav">
+    <div class="nav__inner">
+        <div class="nav__logo" aria-hidden="true">
+            <img src="images/logo.png" alt="">
+        </div>
+        <div class="nav__titles">
+            <h1 class="nav__title">Na cesty</h1>
+            <p class="nav__subtitle">Tvoja cestovateľská os</p>
+        </div>
+        <div class="nav__spacer"></div>
+    </div>
+</header>
+
+<main>
+    <div class="tabs" role="tablist" aria-label="Filter výletov">
+        <button class="tabs__item tabs__item--active" data-filter="active" role="tab">Aktívne</button>
+        <button class="tabs__item" data-filter="archive" role="tab">Archív</button>
+    </div>
+
+    <div class="list" id="trips-list"></div>
+
+    <div class="empty" id="trips-empty" hidden>
+        <div class="empty__emoji">🧳</div>
+        <h2 class="empty__title">Žiadne výlety</h2>
+        <p class="empty__text">Vytvor si prvý výlet a začni plánovať.</p>
+        <button class="empty__cta" data-modal-open="modal-new-trip">+ Nový výlet</button>
+    </div>
+</main>
+
+<button class="fab" data-modal-open="modal-new-trip" aria-label="Nový výlet">+</button>
+
+<!-- Modal: Nový výlet -->
+<div class="modal" id="modal-new-trip" aria-hidden="true" role="dialog" aria-labelledby="modal-new-trip-title">
+    <div class="modal__panel">
+        <div class="modal__handle"></div>
+        <button class="modal__close" data-modal-close aria-label="Zatvoriť">×</button>
+        <h2 class="modal__title" id="modal-new-trip-title">Nový výlet</h2>
+
+        <form id="form-new-trip">
+            <div class="field">
+                <label class="field__label" for="trip-name">Názov výletu</label>
+                <input class="field__input" id="trip-name" name="name" required autofocus
+                       placeholder="napr. Rím + Florencia" maxlength="80">
+            </div>
+            <div class="field">
+                <label class="field__label" for="trip-destination">Destinácia</label>
+                <input class="field__input" id="trip-destination" name="destination"
+                       placeholder="napr. 🇮🇹 Taliansko" maxlength="80">
+            </div>
+            <div class="field">
+                <div class="field__row">
+                    <div>
+                        <label class="field__label" for="trip-start">Začiatok</label>
+                        <input class="field__input" id="trip-start" type="date" name="startDate" required>
+                    </div>
+                    <div>
+                        <label class="field__label" for="trip-days">Počet dní</label>
+                        <input class="field__input" id="trip-days" type="number" name="daysCount"
+                               min="1" max="60" value="3" required>
+                    </div>
+                </div>
+            </div>
+            <div class="btn-row">
+                <button type="button" class="btn btn--ghost" data-modal-close>Zrušiť</button>
+                <button type="submit" class="btn btn--primary">Vytvoriť</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/mock-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

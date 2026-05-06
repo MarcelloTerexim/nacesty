@@ -1,0 +1,104 @@
+# TODO — Fáza 1 (Frontend prototyp)
+
+> Mock dáta v `localStorage`, žiadny backend, mobile-first, moderný štýl, emoji ikony, **iba slovenčina**.
+
+**Stav: implementácia hotová, čaká manuálny test v prehliadači.**
+
+## 🛠️ Setup
+
+- [x] Vytvoriť adresárovú štruktúru (`css/`, `js/`, `assets/icons/`)
+- [x] `index.html`, `trip.html`, `day.html` — inline `<head>` a nav (PHP includes pridáme až vo fáze 2)
+- [x] `css/style.css` — CSS reset + design tokens
+- [x] `assets/icons/logo.svg` — placeholder s gradientom + 🧭
+
+> **Pozn.:** PHP includes (`includes/header.php`, `footer.php`, `nav.php`) **boli odstránené** — fáza 1 ide čisto cez HTML, lebo užívateľ ešte nemá rozchodený lokálny PHP server. PHP sa nasadí vo fáze 2.
+
+## 🎨 Dizajn / design tokens
+
+- [x] Farebná paleta (gradient cyan → fialová, neutrály, status farby)
+- [x] Typografia (system font stack, 6 veľkostí)
+- [x] Spacing škála (4 / 8 / 12 / 16 / 24 / 32 / 48)
+- [x] Tiene (sm, md, lg, fab)
+- [x] Border-radius (sm 8, md 12, lg 16, xl 20, full 9999)
+- [x] Mapa emoji pre kategórie/typy aktivít
+
+## 📱 Obrazovka 1: Home (`index.php`)
+
+- [x] Hlavička s logom (PNG/SVG s emoji 🧭 fallbackom)
+- [x] Filter tabs Aktívne / Archív
+- [x] Karty výletov (názov, destinácia, dátumy, počet dní/aktivít/fotiek, badge)
+- [x] Empty state
+- [x] FAB „+ Nový výlet"
+- [x] Modal Nový výlet (názov, destinácia, start, počet dní)
+
+## 📱 Obrazovka 2: Detail výletu (`trip.php?id=...`)
+
+- [x] Hero hlavička (názov, destinácia, dátumy, status, progress bar)
+- [x] Tlačidlo späť
+- [x] Karty dní s počasím (placeholder dáta) a počtom aktivít
+
+## 📱 Obrazovka 3: Deň / Timeline (`day.php`)
+
+- [x] Hlavička s počasím v subtitle
+- [x] Tlačidlo späť na trip
+- [x] Timeline aktivít (čiara medzi položkami, checkbox, čas, emoji, názov, popis)
+- [x] Hodnotenie (😞 😐 😊) sa zobrazí po označení ako hotová
+- [x] Galéria fotiek pod aktivitou + tlačidlo „pridať fotku"
+- [x] Empty state
+- [x] Tlačidlo „+" v navigácii
+
+## 📱 Modal: Pridanie aktivity (3-krokový wizard)
+
+- [x] Krok 1 — kategória (7 dlaždíc)
+- [x] Krok 2 — typ (variabilne, podľa kategórie)
+- [x] Krok 3 — formulár (názov, čas od/do, poznámka)
+- [x] Progress bar krokov, tlačidlá Späť
+
+## 💾 Mock dáta + localStorage
+
+- [x] Schéma JSON (trips, days, activities, photos)
+- [x] `js/storage.js` — generický CRUD wrapper (collection factory)
+- [x] `js/mock-data.js` — 3 výlety: Rím+Florencia (live), Tatry (planned), Praha (completed)
+- [x] Auto-seed pri prvom načítaní (`Storage.isSeeded`)
+- [x] Auto-generovanie `days` pri vytvorení výletu
+- [x] Upload fotky cez FileReader → base64 do localStorage (limit 4 MB)
+
+## 🎯 Interakcie
+
+- [x] Toggle checkbox → ukladá stav, zobrazí výber smajlíkov
+- [x] Klik na smajlík → uloží/zruší rating
+- [x] Klik na fotku → `target="_blank"` (placeholder pre lightbox)
+- [x] Kliknutie mimo modalu / Escape → zatvorenie
+- [ ] ~~Drag fotky na aktivitu~~ → **presunuté do Fázy 3**
+
+## ✨ Polish
+
+- [x] Smooth animácie (slideUp pri modale, hover transforms, pulse pre live badge)
+- [x] Empty states (3 varianty)
+- [x] Touch-friendly veľkosti (44×44 tap targets, 48 px tlačidlá)
+- [x] Focus states cez `:focus-visible`
+- [x] `prefers-reduced-motion` rešpekt
+
+## 🧪 Manuálny test scenár
+
+- [ ] Otvoriť `index.html` (dvojklik alebo Live Server) → vidím 3 sample výlety (1 live, 1 planned, 1 v archíve)
+- [ ] Vytvoriť nový výlet (3 dni) → zobrazí sa v Aktívne
+- [ ] Otvoriť detail → vidím Day 1, 2, 3 s dátumami
+- [ ] Otvoriť Day 1 → pridať aktivitu cez 3-krokový wizard
+- [ ] Označiť ako hotovú → vybrať smajlík
+- [ ] Pridať fotku → preview pod aktivitou
+- [ ] Refresh stránky → dáta zostali
+- [ ] Skontrolovať šírky: 360, 414, 768, 1024 px
+
+## 🐛 Známe limity (pre fázu 2/3)
+
+- localStorage limit ~5 MB → veľa fotiek = problém
+- Photos sú base64 v rovnakom úložisku ako trips (riešime v phase 2 file storage)
+- Bez auth, bez multi-user
+- Počasie iba mock, nie reálne API
+- Žiadne zoraďovanie aktivít drag&drop (fáza 3)
+- Lightbox fotiek len `target="_blank"` (full overlay neskôr)
+
+---
+
+**Po dokončení manuálneho testu** → review s užívateľom → schválenie → presun na Fázu 2 (Backend + DB).

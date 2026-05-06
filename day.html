@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#06b6d4">
+    <title>Deň · Na cesty</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="images/logo.png">
+</head>
+<body data-page="day">
+
+<header class="nav">
+    <div class="nav__inner">
+        <a href="trip.html" class="nav__back" aria-label="Späť" id="nav-back-link">
+            <span aria-hidden="true">←</span>
+        </a>
+        <div class="nav__titles">
+            <h1 class="nav__title" id="nav-title">Deň</h1>
+            <p class="nav__subtitle" id="nav-subtitle"></p>
+        </div>
+        <button type="button" class="nav__action" data-modal-open="modal-add-activity" aria-label="Pridať aktivitu">
+            <span aria-hidden="true">+</span>
+        </button>
+    </div>
+</header>
+
+<main>
+    <div id="day-detail"></div>
+</main>
+
+<!-- Modal: Pridanie aktivity (3-krokový wizard) -->
+<div class="modal" id="modal-add-activity" aria-hidden="true" role="dialog" aria-labelledby="wizard-title">
+    <div class="modal__panel">
+        <div class="modal__handle"></div>
+        <button class="modal__close" data-modal-close aria-label="Zatvoriť">×</button>
+        <div class="wizard__steps">
+            <div class="wizard__step wizard__step--active"></div>
+            <div class="wizard__step"></div>
+            <div class="wizard__step"></div>
+        </div>
+        <h2 class="modal__title" id="wizard-title">Vyber kategóriu</h2>
+        <div id="wizard-body"></div>
+    </div>
+</div>
+
+<script src="js/storage.js"></script>
+<script src="js/mock-data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
