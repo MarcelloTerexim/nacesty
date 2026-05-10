@@ -1123,6 +1123,51 @@ h3 { font-size: var(--fs-base); }
     display: block;
 }
 
+/* ---------- Timeline visual (vertikálna čiara s ikonkami) ---------- */
+#timeline-container {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: var(--sp-4);
+    position: relative;
+}
+
+.timeline-visual {
+    position: relative;
+    width: 60px;
+}
+
+.timeline-visual::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--color-primary-1), var(--color-primary-2));
+    transform: translateX(-50%);
+}
+
+.timeline-icon {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 44px;
+    background: var(--color-surface);
+    border: 2px solid var(--color-primary-1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: var(--shadow-md);
+}
+
+.timeline-items {
+    display: flex;
+    flex-direction: column;
+}
+
 /* ---------- Wizard (pridanie aktivity) ---------- */
 .wizard__steps {
     display: flex;

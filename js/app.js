@@ -520,7 +520,18 @@ function renderDay() {
             <p class="empty__text">Pridaj prvú aktivitu pre tento deň.</p>
             <button class="empty__cta" data-modal-open="modal-add-activity">+ Pridať aktivitu</button>
         </div>`
-        : `<div class="timeline" id="timeline">${acts.map(a => renderActivity(a)).join('')}</div>`;
+        : `<div id="timeline-container">
+            <div class="timeline-visual">
+                ${acts.map((a, i) => `
+                    <div class="timeline-icon" style="top: ${(i * 100) / acts.length}%;">
+                        ${a.typeEmoji}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="timeline-items">
+                ${acts.map(a => renderActivity(a)).join('')}
+            </div>
+        </div>`;
 
     container.innerHTML = `
         <div class="days-list">${daysList}</div>
