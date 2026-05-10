@@ -181,8 +181,11 @@ document.addEventListener('keydown', (e) => {
 
 function renderBudgetView(tripId, dayId) {
     const trip = Storage.trips.find(t => t.id === tripId);
-    const day = Storage.days.find(d => d.id === dayId);
-    if (!trip || !day) return '<div class="empty">Chyba: Výlet alebo deň sa nenašiel</div>';
+    if (!trip) return '<div class="empty">Chyba: Výlet sa nenašiel</div>';
+
+    // Ak dayId je null, zobraziť rozpočet všetkých dní (trip view)
+    // Ak dayId je špecifický, zobraziť rozpočet len pre daný deň (day view)
+    const day = dayId ? Storage.days.find(d => d.id === dayId) : null;
 
     const days = Storage.days.filter(d => d.tripId === tripId).sort((a, b) => a.dayIndex - b.dayIndex);
     const allActs = Storage.activities.filter(a => {
@@ -387,7 +390,31 @@ function renderTrip() {
         `;
     }
 
-    $('#trip-detail').innerHTML = `<div class="list" id="days-list"></div>`;
+    // Generovať tri pohľady (timeline, rozpočet, album)
+    const days = Storage.days.filter(d => d.tripId === trip.id).sort((a, b) => a.dayIndex - b.dayIndex);
+
+    let timelineHtml = '<div class="timeline-view active"><div class="list" id="days-list">';
+
+    days.forEach(d => {
+        const acts = Storage.activities
+            .filter(a => a.dayId === d.id)
+            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+        const done = acts.filter(a => a.isCompleted).length;
+
+        timelineHtml += `
+            <a href="day.html?trip=${encodeURIComponent(trip.id)}&day=${encodeURIComponent(d.id)}" class="day-card">
+                <div class="day-card__title-row">
+                    <span class="day-card__title">Deň ${d.dayIndex}</span>
+                    <span class="day-card__date">${fmtDate(d.date)}</span>
+                </div>
+                ${acts.length ? `<div class="day-card__stats">✓ ${done}/${acts.length}</div>` : ''}
+            </a>
+        `;
+    });
+
+    timelineHtml += '</div></div>';
+
+    $('#trip-detail').innerHTML = timelineHtml + renderBudgetView(trip.id, null) + renderAlbumView(trip.id);
 
     const days = Storage.days
         .filter(d => d.tripId === trip.id)
@@ -582,7 +609,7 @@ document.addEventListener('click', (e) => {
 
     const photoId = deleteBtn.dataset.photoId;
     if (confirm('Odstrániť fotku?')) {
-        Storage.photos.delete(photoId);
+        Storage.photos.remove(photoId);
         rerenderCurrent();
     }
 });
@@ -598,7 +625,7 @@ document.addEventListener('change', (e) => {
 
     const newStatus = archiveCheckbox.checked ? 'completed' : 'planned';
     Storage.trips.update(tripId, { status: newStatus });
-    renderTrip();
+    window.location.href = 'index.html';
 });
 
 /* ---------- Photo upload ---------- */
@@ -646,7 +673,7 @@ document.addEventListener('click', (e) => {
 
     if (document.body.dataset.page === 'home') {
         renderHome();
-    } else if (document.body.dataset.page === 'day' && tabsContainer.classList.contains('tabs--view')) {
+    } else if (tabsContainer.classList.contains('tabs--view')) {
         const view = tab.dataset.view;
         const allViews = document.querySelectorAll('.timeline-view, .budget-view, .album-view');
         allViews.forEach(v => v.classList.remove('active'));
