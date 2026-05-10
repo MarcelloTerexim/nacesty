@@ -548,6 +548,11 @@ h3 { font-size: var(--fs-base); }
     box-shadow: var(--shadow-md);
     outline: none;
 }
+.day-card--active {
+    background: var(--gradient-primary-soft);
+    border-color: var(--color-primary-1);
+    box-shadow: var(--shadow-md);
+}
 .day-card__head {
     display: flex;
     justify-content: space-between;

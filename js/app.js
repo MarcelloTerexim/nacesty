@@ -236,6 +236,10 @@ function renderTrip() {
     $('#nav-title').textContent = trip.name;
     $('#nav-subtitle').textContent = trip.destination;
 
+    // Aktualizovať hero sekciu
+    $('#hero-title').textContent = trip.name;
+    $('#hero-date').textContent = `${trip.destination} · ${fmtDateRange(trip.startDate, trip.endDate)}`;
+
     const s = tripStats(trip.id);
     const progress = s.activities ? Math.round((s.doneActivities / s.activities) * 100) : 0;
 
@@ -311,24 +315,57 @@ function renderDay() {
     $('#nav-subtitle').textContent = `${fmtDate(day.date)} · ${day.weatherEmoji} ${day.weatherTemp}°C ${day.weatherSummary}`;
     $('#nav-back-link').href = `trip.html?id=${encodeURIComponent(tripId)}`;
 
+    // Aktualizovať hero sekciu
+    $('#hero-title').textContent = `${trip.name}`;
+    $('#hero-date').textContent = `Deň ${day.dayIndex} · ${fmtDate(day.date)}`;
+
     const acts = Storage.activities
         .filter(a => a.dayId === day.id)
         .sort((a, b) => a.startTime.localeCompare(b.startTime));
 
     const container = $('#day-detail');
+
+    // Generovať zoznam dní
+    const days = Storage.days
+        .filter(d => d.tripId === trip.id)
+        .sort((a, b) => a.dayIndex - b.dayIndex);
+
+    const daysList = days.map(d => {
+        const isActive = d.id === day.id;
+        const daysActs = Storage.activities
+            .filter(a => a.dayId === d.id)
+            .sort((a, b) => a.startTime.localeCompare(b.startTime));
+        const done = daysActs.filter(a => a.isCompleted).length;
+        return `
+            <a href="day.html?trip=${encodeURIComponent(trip.id)}&day=${encodeURIComponent(d.id)}" class="day-card ${isActive ? 'day-card--active' : ''}">
+                <div class="day-card__title-row">
+                    <span class="day-card__title">Deň ${d.dayIndex}</span>
+                    <span class="day-card__date">${fmtDate(d.date)}</span>
+                </div>
+                ${daysActs.length ? `<div class="day-card__stats"><span>✓ ${done}/${daysActs.length}</span></div>` : ''}
+            </a>
+        `;
+    }).join('');
+
     if (acts.length === 0) {
         container.innerHTML = `
-            <div class="empty">
-                <div class="empty__emoji">✨</div>
-                <h2 class="empty__title">Zatiaľ žiadne aktivity</h2>
-                <p class="empty__text">Pridaj prvú aktivitu pre tento deň.</p>
-                <button class="empty__cta" data-modal-open="modal-add-activity">+ Pridať aktivitu</button>
+            <div class="days-list">${daysList}</div>
+            <div class="timeline-container">
+                <div class="empty">
+                    <div class="empty__emoji">✨</div>
+                    <h2 class="empty__title">Zatiaľ žiadne aktivity</h2>
+                    <p class="empty__text">Pridaj prvú aktivitu pre tento deň.</p>
+                    <button class="empty__cta" data-modal-open="modal-add-activity">+ Pridať aktivitu</button>
+                </div>
             </div>
         `;
         return;
     }
 
-    container.innerHTML = `<div class="timeline" id="timeline"></div>`;
+    container.innerHTML = `
+        <div class="days-list">${daysList}</div>
+        <div class="timeline-container"><div class="timeline" id="timeline"></div></div>
+    `;
     const tl = $('#timeline');
     tl.innerHTML = acts.map(a => renderActivity(a)).join('');
 }
