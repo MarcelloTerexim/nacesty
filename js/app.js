@@ -497,7 +497,7 @@ function renderDay() {
 
     container.innerHTML = `
         <div class="days-list">${daysList}</div>
-        <div class="timeline-container">
+        <div class="timeline-wrapper">
             <div class="timeline-view active">${timelineHtml}</div>
             ${renderBudgetView(tripId, dayId)}
             ${renderAlbumView(tripId)}
