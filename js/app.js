@@ -177,6 +177,122 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+/* ---------- Rozpočet a Album renderery ---------- */
+
+function renderBudgetView(tripId, dayId) {
+    const trip = Storage.trips.find(t => t.id === tripId);
+    const day = Storage.days.find(d => d.id === dayId);
+    if (!trip || !day) return '<div class="empty">Chyba: Výlet alebo deň sa nenašiel</div>';
+
+    const days = Storage.days.filter(d => d.tripId === tripId).sort((a, b) => a.dayIndex - b.dayIndex);
+    const allActs = Storage.activities.filter(a => {
+        const d = Storage.days.find(dd => dd.id === a.dayId);
+        return d && d.tripId === tripId;
+    });
+
+    let html = '<div class="budget-view active">';
+
+    // Rozpočet po dňoch
+    days.forEach(d => {
+        const acts = Storage.activities.filter(a => a.dayId === d.id);
+        const budgetByCategory = {};
+        let dayTotal = 0;
+
+        acts.forEach(a => {
+            if (a.amount) {
+                const cat = CATEGORIES[a.category]?.label || 'Iné';
+                budgetByCategory[cat] = (budgetByCategory[cat] || 0) + a.amount;
+                dayTotal += a.amount;
+            }
+        });
+
+        if (Object.keys(budgetByCategory).length > 0) {
+            html += `<div class="budget-daily">
+                <div class="budget-day-header">Deň ${d.dayIndex} · ${fmtDate(d.date)}</div>
+                <table class="budget-table">
+                    <thead><tr><th>Kategória</th><th class="budget-amount">Suma</th></tr></thead>
+                    <tbody>
+                        ${Object.entries(budgetByCategory).map(([cat, sum]) => `
+                            <tr><td>${escapeHtml(cat)}</td><td class="budget-amount">€ ${sum.toFixed(2)}</td></tr>
+                        `).join('')}
+                        <tr class="budget-total"><td><strong>Spolu Deň ${d.dayIndex}</strong></td><td class="budget-amount">€ ${dayTotal.toFixed(2)}</td></tr>
+                    </tbody>
+                </table>
+            </div>`;
+        }
+    });
+
+    // Celkový rozpočet podľa kategórií
+    const budgetByCategory = {};
+    let tripTotal = 0;
+    allActs.forEach(a => {
+        if (a.amount) {
+            const cat = CATEGORIES[a.category]?.label || 'Iné';
+            budgetByCategory[cat] = (budgetByCategory[cat] || 0) + a.amount;
+            tripTotal += a.amount;
+        }
+    });
+
+    if (Object.keys(budgetByCategory).length > 0) {
+        html += `<div class="budget-summary">
+            <div class="budget-summary-title">Rozpočet celkovo</div>
+            <table class="budget-table">
+                <thead><tr><th>Kategória</th><th class="budget-amount">Suma</th></tr></thead>
+                <tbody>
+                    ${Object.entries(budgetByCategory).map(([cat, sum]) => `
+                        <tr><td>${escapeHtml(cat)}</td><td class="budget-amount">€ ${sum.toFixed(2)}</td></tr>
+                    `).join('')}
+                    <tr class="budget-total"><td><strong>CELKOM</strong></td><td class="budget-amount"><strong>€ ${tripTotal.toFixed(2)}</strong></td></tr>
+                </tbody>
+            </table>
+        </div>`;
+    }
+
+    html += '</div>';
+    return html;
+}
+
+function renderAlbumView(tripId) {
+    const trip = Storage.trips.find(t => t.id === tripId);
+    if (!trip) return '<div class="empty">Chyba: Výlet sa nenašiel</div>';
+
+    const days = Storage.days.filter(d => d.tripId === tripId).sort((a, b) => a.dayIndex - b.dayIndex);
+    let html = '<div class="album-view active">';
+
+    days.forEach(d => {
+        const photos = Storage.photos.filter(p => {
+            const act = Storage.activities.find(a => a.id === p.activityId);
+            return act && act.dayId === d.id;
+        });
+
+        if (photos.length > 0) {
+            html += `<div class="album-day">
+                <div class="album-day-title">Deň ${d.dayIndex} · ${fmtDate(d.date)}</div>
+                <div class="album-grid">
+                    ${photos.map(p => `
+                        <div class="album-photo-item">
+                            <img src="${p.dataUrl}" alt="Fotka" class="album-photo-img">
+                            <button class="album-photo-delete" data-act="delete-photo" data-photo-id="${p.id}" aria-label="Odstrániť fotku">×</button>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+        }
+    });
+
+    const allPhotos = Storage.photos.filter(p => {
+        const act = Storage.activities.find(a => a.id === p.activityId);
+        return act && days.some(d => d.id === act.dayId);
+    });
+
+    if (allPhotos.length === 0) {
+        html += '<div class="album-empty"><div class="empty__emoji">📷</div><p>Zatiaľ žiadne fotky</p></div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
 /* ---------- Renderers ---------- */
 
 function renderHome() {
@@ -248,6 +364,28 @@ function renderTrip() {
         <span class="hero__badge badge badge--${trip.status}">${STATUS_LABEL[trip.status]}</span>
         <span>✓ ${s.doneActivities}/${s.activities} (${progress}%)</span>
     `;
+
+    // Trip header box s archivovacím poľom
+    const headerBox = $('#trip-header-box');
+    if (headerBox) {
+        headerBox.innerHTML = `
+            <div class="trip-header-content">
+                <div class="trip-info">
+                    <div class="trip-info-name">${escapeHtml(trip.name)}</div>
+                    <div class="trip-info-meta">
+                        <span>📍 ${escapeHtml(trip.destination)}</span>
+                        <span class="badge badge--${trip.status}">${STATUS_LABEL[trip.status]}</span>
+                    </div>
+                </div>
+                <div class="trip-archive-section">
+                    <input type="checkbox" class="trip-archive-checkbox" id="archive-trip"
+                           ${trip.status === 'completed' ? 'checked' : ''}
+                           data-trip-id="${trip.id}" aria-label="Archivovať výlet">
+                    <label class="trip-archive-label" for="archive-trip">Archivovať</label>
+                </div>
+            </div>
+        `;
+    }
 
     $('#trip-detail').innerHTML = `<div class="list" id="days-list"></div>`;
 
@@ -348,35 +486,33 @@ function renderDay() {
         `;
     }).join('');
 
-    if (acts.length === 0) {
-        container.innerHTML = `
-            <div class="days-list">${daysList}</div>
-            <div class="timeline-container">
-                <div class="empty">
-                    <div class="empty__emoji">✨</div>
-                    <h2 class="empty__title">Zatiaľ žiadne aktivity</h2>
-                    <p class="empty__text">Pridaj prvú aktivitu pre tento deň.</p>
-                    <button class="empty__cta" data-modal-open="modal-add-activity">+ Pridať aktivitu</button>
-                </div>
-            </div>
-        `;
-        return;
-    }
+    const timelineHtml = acts.length === 0
+        ? `<div class="empty">
+            <div class="empty__emoji">✨</div>
+            <h2 class="empty__title">Zatiaľ žiadne aktivity</h2>
+            <p class="empty__text">Pridaj prvú aktivitu pre tento deň.</p>
+            <button class="empty__cta" data-modal-open="modal-add-activity">+ Pridať aktivitu</button>
+        </div>`
+        : `<div class="timeline" id="timeline">${acts.map(a => renderActivity(a)).join('')}</div>`;
 
     container.innerHTML = `
         <div class="days-list">${daysList}</div>
-        <div class="timeline-container"><div class="timeline" id="timeline"></div></div>
+        <div class="timeline-container">
+            <div class="timeline-view active">${timelineHtml}</div>
+            ${renderBudgetView(tripId, dayId)}
+            ${renderAlbumView(tripId)}
+        </div>
     `;
-    const tl = $('#timeline');
-    tl.innerHTML = acts.map(a => renderActivity(a)).join('');
 }
 
 function renderActivity(a) {
     const photos = Storage.photos.filter(p => p.activityId === a.id);
+    const endTime = a.endTime || a.startTime;
+    const timeRange = `${a.startTime} - ${endTime}`;
     return `
         <div class="activity ${a.isCompleted ? 'activity--done' : ''}" data-activity-id="${a.id}">
             <button class="activity__check" data-act="toggle" aria-label="${a.isCompleted ? 'Odznačiť ako hotové' : 'Označiť ako hotové'}">${a.isCompleted ? '✓' : ''}</button>
-            <div class="activity__time">${a.startTime}</div>
+            <div class="activity__time">${timeRange}</div>
             <div class="activity__body">
                 <div class="activity__head">
                     <span class="activity__icon">${a.typeEmoji}</span>
@@ -439,6 +575,32 @@ document.addEventListener('click', (e) => {
     }
 });
 
+/* ---------- Delete photo (Album) ---------- */
+document.addEventListener('click', (e) => {
+    const deleteBtn = e.target.closest('[data-act="delete-photo"]');
+    if (!deleteBtn) return;
+
+    const photoId = deleteBtn.dataset.photoId;
+    if (confirm('Odstrániť fotku?')) {
+        Storage.photos.delete(photoId);
+        rerenderCurrent();
+    }
+});
+
+/* ---------- Archive trip ---------- */
+document.addEventListener('change', (e) => {
+    const archiveCheckbox = e.target.closest('#archive-trip');
+    if (!archiveCheckbox) return;
+
+    const tripId = archiveCheckbox.dataset.tripId;
+    const trip = Storage.trips.find(t => t.id === tripId);
+    if (!trip) return;
+
+    const newStatus = archiveCheckbox.checked ? 'completed' : 'planned';
+    Storage.trips.update(tripId, { status: newStatus });
+    renderTrip();
+});
+
 /* ---------- Photo upload ---------- */
 function triggerPhotoUpload(activityId) {
     const input = document.createElement('input');
@@ -476,9 +638,21 @@ function triggerPhotoUpload(activityId) {
 document.addEventListener('click', (e) => {
     const tab = e.target.closest('.tabs__item');
     if (!tab) return;
-    const tabs = tab.parentElement.querySelectorAll('.tabs__item');
+    if (tab.disabled) return;
+
+    const tabsContainer = tab.parentElement;
+    const tabs = tabsContainer.querySelectorAll('.tabs__item');
     tabs.forEach(t => t.classList.toggle('tabs__item--active', t === tab));
-    if (document.body.dataset.page === 'home') renderHome();
+
+    if (document.body.dataset.page === 'home') {
+        renderHome();
+    } else if (document.body.dataset.page === 'day' && tabsContainer.classList.contains('tabs--view')) {
+        const view = tab.dataset.view;
+        const allViews = document.querySelectorAll('.timeline-view, .budget-view, .album-view');
+        allViews.forEach(v => v.classList.remove('active'));
+        const activeView = document.querySelector(`.${view}-view`);
+        if (activeView) activeView.classList.add('active');
+    }
 });
 
 /* ---------- Vytvorenie výletu ---------- */

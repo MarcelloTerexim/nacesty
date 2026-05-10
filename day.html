@@ -12,16 +12,19 @@
 
 <header class="nav">
     <div class="nav__inner">
-        <button type="button" class="nav__action nav__action--add" data-modal-open="modal-add-activity" aria-label="Pridať aktivitu">
-            <span aria-hidden="true">+</span> PRIDAJ
-        </button>
+        <a href="index.html" class="nav__home" aria-label="Domov">
+            <span aria-hidden="true">🏠</span>
+        </a>
+        <a href="trip.html" class="nav__back" aria-label="Späť" id="nav-back-link">
+            <span aria-hidden="true">←</span>
+        </a>
         <div class="nav__titles">
             <h1 class="nav__title" id="nav-title">Deň</h1>
             <p class="nav__subtitle" id="nav-subtitle"></p>
         </div>
-        <a href="trip.html" class="nav__back" aria-label="Späť" id="nav-back-link">
-            <span aria-hidden="true">←</span>
-        </a>
+        <button type="button" class="nav__action nav__action--add" data-modal-open="modal-add-activity" aria-label="Pridať aktivitu">
+            <span aria-hidden="true">+</span> PRIDAJ
+        </button>
     </div>
 </header>
 
@@ -34,6 +37,14 @@
 </div>
 
 <main>
+    <div class="tabs tabs--view" role="tablist" aria-label="Pohľady">
+        <button class="tabs__item tabs__item--active" data-view="timeline" role="tab">Časová os</button>
+        <button class="tabs__item" data-view="budget" role="tab">Rozpočet</button>
+        <button class="tabs__item" data-view="album" role="tab">Album</button>
+        <button class="tabs__item" data-view="map" role="tab" disabled>Mapa</button>
+        <button class="tabs__item" data-view="report" role="tab" disabled>Report</button>
+    </div>
+
     <div id="day-detail"></div>
 </main>
 
