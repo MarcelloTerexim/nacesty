@@ -2,7 +2,7 @@
 
 > Mock dáta v `localStorage`, žiadny backend, mobile-first, moderný štýl, emoji ikony, **iba slovenčina**.
 
-**Stav: implementácia hotová, čaká manuálny test v prehliadači.**
+**Stav: ✅ HOTOVA — Fáza 1.1 + 1.2 + 1.3 + 1.4a IMPLEMENTOVANÉ A OTESTOVANÉ.**
 
 ## 🛠️ Setup
 
@@ -47,12 +47,58 @@
 - [x] Empty state
 - [x] Tlačidlo „+" v navigácii
 
-## 📱 Modal: Pridanie aktivity (3-krokový wizard)
+## 📱 Modal: Pridanie aktivity (3-krokový wizard) — ZÁKLADNÉ
 
 - [x] Krok 1 — kategória (7 dlaždíc)
 - [x] Krok 2 — typ (variabilne, podľa kategórie)
 - [x] Krok 3 — formulár (názov, čas od/do, poznámka)
 - [x] Progress bar krokov, tlačidlá Späť
+
+## ✨ FÁZA 1.1 + 1.2 + 1.3 + 1.4a — ROZŠÍRENÉ FUNKCIE (✅ HOTOVÉ)
+
+### 1.1.1 — Rozšírenie kategórií a typov
+- [x] **Doprava:** Pridaný typ `Metro/Subway` (🚇)
+- [x] **Jedlo:** Rozšírené na 12 typov:
+  - `Obed` (🍲), `Večera` (🍷), `Snack` (🍿), `Drink` (☕)
+  - `Potraviny` (🛒), `Domáce` (🍳) — NOVÉ
+  - Existujúce: Reštaurácia, Kaviareň, Fast food, Bar, Raňajky
+
+### 1.1.2 — Tlačidlo na pridanie aktivity
+- [x] Presunúť z **pravej strany na ľavú** v `day.html` nav
+- [x] Zmeniť text z `+` na **`+ PRIDAJ`**
+- [x] CSS trieda `.nav__action--add` pre správny layout
+
+### 1.1.3 — Automatické vrátenie koncového času
+- [x] Keď sa zmení `startTime`, `endTime` sa automaticky nastavi na **startTime + 1 hodina**
+- [x] Event listener na `.change` v `#form-new-activity input[name="startTime"]`
+- [x] Užívateľ môže `endTime` ručne zmeniť
+
+### 1.1.4 — Pole na sumu v EUR
+- [x] Nové pole v Kroku 3: `Suma (EUR)` — number input (0–9999.99)
+- [x] Uloženie do `amount: null | number` v `Storage.activities`
+- [x] Zobrazenie v timeline: **€ 15.50** (zelená farba #059669)
+- [x] CSS `.activity__amount` štýl
+
+### 1.2.1 — Inteligentný default čas
+- [x] Funkcia `computeDefaultStartTime(dayId)` — nájde poslednú aktivitu v dňi
+- [x] Default `startTime = endTime poslednej + 30 minút`
+- [x] Ak žiadna aktivita: default `09:00`
+- [x] Automaticky sa nastaví aj `endTime = startTime + 1h`
+- [x] `Wizard.state.dayId` — pridané do state pri otvorení modalu
+
+### 1.3.1 — Vlastný typ "INE" s pamäťou
+- [x] Každá kategória má typ **`Iné` (✏️)** na konci
+- [x] Funkcie `loadCustomTypes()` a `saveCustomType()` — localStorage `'nacesty.customTypes'`
+- [x] V **Kroku 2:** Zobrazovanie saved custom types ako dodatočné tlačidlá
+- [x] V **Kroku 3:** Validácia — title je **povinný** pre "ine" typ
+- [x] Submit handler: Ak `type === 'ine'`, uloží custom type a nastaví `type: 'custom:NAZOV'`
+- [x] Zapamätané názvy sa ponúkajú v ďalšom výbere ako `tile--custom`
+
+### 1.4a — Umiestnenie (text pole)
+- [x] Nové pole v Kroku 3: `Umiestnenie` — text input (max 160 znakov)
+- [x] Uloženie do `location: null | string` v `Storage.activities`
+- [x] Zobrazenie v timeline: **📍 Koloseum, Rím** (modrá farba #0891b2)
+- [x] CSS `.activity__location` štýl
 
 ## 💾 Mock dáta + localStorage
 

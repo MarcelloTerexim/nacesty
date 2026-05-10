@@ -147,6 +147,15 @@ h3 { font-size: var(--fs-base); }
     outline: none;
 }
 .nav__action { font-size: 28px; line-height: 1; }
+.nav__action--add {
+    width: auto;
+    padding: 0 var(--sp-3);
+    font-size: var(--fs-base);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
 .nav__titles { flex: 1; min-width: 0; }
 .nav__title {
     font-size: var(--fs-lg);
@@ -606,6 +615,19 @@ h3 { font-size: var(--fs-base); }
 .activity__desc {
     font-size: var(--fs-sm);
     color: var(--color-text-muted);
+    margin-bottom: var(--sp-2);
+}
+.activity__amount {
+    display: block;
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: #059669;
+    margin-bottom: var(--sp-2);
+}
+.activity__location {
+    display: block;
+    font-size: var(--fs-sm);
+    color: #0891b2;
     margin-bottom: var(--sp-2);
 }
 .activity__rating {

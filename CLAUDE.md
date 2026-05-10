@@ -17,7 +17,7 @@ Plná špecifikácia: `tripflow_prirucka.docx` v koreni projektu.
 
 | Fáza | Obsah | Stav |
 |------|-------|------|
-| **1. Frontend prototyp** | UI, mock dáta v `localStorage`, žiadny backend | 🟡 prebieha |
+| **1. Frontend prototyp** | UI, mock dáta v `localStorage`, žiadny backend | ✅ HOTOVÁ |
 | **2. Backend + DB + MVP** | PHP API, MariaDB, JWT auth, upload fotiek | ⚪ čaká |
 | **3. Pokročilé funkcie** | Auto-priraďovanie fotiek (EXIF/GPS), POI (OSM), počasie, report PDF | ⚪ čaká |
 
@@ -66,6 +66,30 @@ Ak preferuješ HTTP, ľubovoľný statický server stačí — napríklad cez VS
 - **Vizuálny štýl:** moderný — gradient akcenty, zaoblené karty (border-radius 12–16 px), jemné tiene, veľa whitespace.
 - **Lightbox fotiek:** vo fáze 1 placeholder (`<a target="_blank">` na full-size); skutočný overlay lightbox až neskôr.
 - **PHP** sa zatiaľ používa len na `include` (spoločná hlavička/pätička), žiadna logika ani DB.
+
+## ✨ Nové funkcie Fázy 1 (Etapa 1 — schválené 2026-05-10)
+
+### Kategórie a typy aktivít — ROZŠÍRENÉ
+- **Doprava:** Pridaný `Metro/Subway` (🚇)
+- **Jedlo:** Rozšírené na 12 typov (Obed 🍲, Večera 🍷, Snack 🍿, Drink ☕, Potraviny 🛒, Domáce 🍳)
+
+### Všetky aktivity majú nové polia
+- **Suma (EUR):** Číslo 0–9999.99, zobrazuje sa ako **€ 15.50** (zelená)
+- **Umiestnenie:** Text, max 160 znakov, zobrazuje sa ako **📍 Koloseum, Rím** (modrá)
+- **Default čas:** StartTime sa automaticky počíta ako koniec poslednej aktivity + 30 min (ak prvá: 09:00)
+- **Auto-endTime:** Keď sa zmení startTime, endTime sa automaticky nastaví na +1 hodina
+
+### Tlačidlo "+ PRIDAJ"
+- **Poloha:** Ľavá strana navigácie v `day.html`
+- **Text:** "+ PRIDAJ" (namiesto len "+")
+- **CSS:** `.nav__action--add` trieda
+
+### Vlastný typ aktivity — "Iné"
+- Každá kategória má typ **"Iné" (✏️)** na konci Kroku 2
+- **Pamäť:** Zapisané custom names sa ukladajú do localStorage (`'nacesty.customTypes'`)
+- **Zobrazenie:** Zapamätané nazvy sa ponúkajú ako tlačidlá v ďalšom výbere
+- **Validácia:** Musí byť vyplnený názov aktivity
+- **Uloženie:** V `Storage.activities.type` sa ukladá ako `'custom:NAZOV'`
 
 ## Posunuté do neskorších fáz
 

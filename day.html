@@ -12,16 +12,16 @@
 
 <header class="nav">
     <div class="nav__inner">
-        <a href="trip.html" class="nav__back" aria-label="Späť" id="nav-back-link">
-            <span aria-hidden="true">←</span>
-        </a>
+        <button type="button" class="nav__action nav__action--add" data-modal-open="modal-add-activity" aria-label="Pridať aktivitu">
+            <span aria-hidden="true">+</span> PRIDAJ
+        </button>
         <div class="nav__titles">
             <h1 class="nav__title" id="nav-title">Deň</h1>
             <p class="nav__subtitle" id="nav-subtitle"></p>
         </div>
-        <button type="button" class="nav__action" data-modal-open="modal-add-activity" aria-label="Pridať aktivitu">
-            <span aria-hidden="true">+</span>
-        </button>
+        <a href="trip.html" class="nav__back" aria-label="Späť" id="nav-back-link">
+            <span aria-hidden="true">←</span>
+        </a>
     </div>
 </header>
 

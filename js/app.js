@@ -9,13 +9,22 @@ const CATEGORIES = {
         { id: 'mhd', emoji: '🚊', label: 'MHD' },
         { id: 'pesi', emoji: '🚶', label: 'Pešo' },
         { id: 'lod', emoji: '🛳️', label: 'Loď' },
+        { id: 'metro', emoji: '🚇', label: 'Metro/Subway' },
+        { id: 'ine', emoji: '✏️', label: 'Iné' },
     ] },
     jedlo: { emoji: '🍽️', label: 'Jedlo', types: [
         { id: 'restauracia', emoji: '🍽️', label: 'Reštaurácia' },
+        { id: 'obed', emoji: '🍲', label: 'Obed' },
+        { id: 'vecera', emoji: '🍷', label: 'Večera' },
+        { id: 'snack', emoji: '🍿', label: 'Snack' },
+        { id: 'drink', emoji: '☕', label: 'Drink' },
+        { id: 'potraviny', emoji: '🛒', label: 'Potraviny' },
+        { id: 'home-made', emoji: '🍳', label: 'Domáce' },
         { id: 'kaviaren', emoji: '☕', label: 'Kaviareň' },
         { id: 'fastfood', emoji: '🍕', label: 'Fast food' },
         { id: 'bar', emoji: '🍷', label: 'Bar' },
         { id: 'ranajky', emoji: '🥐', label: 'Raňajky' },
+        { id: 'ine', emoji: '✏️', label: 'Iné' },
     ] },
     kultura: { emoji: '🏛️', label: 'Kultúra', types: [
         { id: 'pamiatka', emoji: '🏛️', label: 'Pamiatka' },
@@ -23,29 +32,34 @@ const CATEGORIES = {
         { id: 'divadlo', emoji: '🎭', label: 'Divadlo' },
         { id: 'koncert', emoji: '🎵', label: 'Koncert' },
         { id: 'kostol', emoji: '⛪', label: 'Kostol' },
+        { id: 'ine', emoji: '✏️', label: 'Iné' },
     ] },
     oddych: { emoji: '🏖️', label: 'Oddych', types: [
         { id: 'plaz', emoji: '🏖️', label: 'Pláž' },
         { id: 'park', emoji: '🌳', label: 'Park' },
         { id: 'spa', emoji: '🧖', label: 'Spa' },
         { id: 'vyhlad', emoji: '🌅', label: 'Výhľad' },
+        { id: 'ine', emoji: '✏️', label: 'Iné' },
     ] },
     sport: { emoji: '🏃', label: 'Šport', types: [
         { id: 'turistika', emoji: '🥾', label: 'Turistika' },
         { id: 'bicykel', emoji: '🚴', label: 'Bicykel' },
         { id: 'plavanie', emoji: '🏊', label: 'Plávanie' },
         { id: 'lyzovanie', emoji: '🎿', label: 'Lyžovanie' },
+        { id: 'ine', emoji: '✏️', label: 'Iné' },
     ] },
     nakupy: { emoji: '🛍️', label: 'Nákupy', types: [
         { id: 'obchody', emoji: '🛍️', label: 'Obchody' },
         { id: 'trhy', emoji: '🏪', label: 'Trhy' },
         { id: 'suveniry', emoji: '🎁', label: 'Suveníry' },
+        { id: 'ine', emoji: '✏️', label: 'Iné' },
     ] },
     ubytovanie: { emoji: '🛏️', label: 'Ubytovanie', types: [
         { id: 'hotel', emoji: '🏨', label: 'Hotel' },
         { id: 'airbnb', emoji: '🏠', label: 'Airbnb' },
         { id: 'hostel', emoji: '🛏️', label: 'Hostel' },
         { id: 'kemp', emoji: '🏕️', label: 'Kemp' },
+        { id: 'ine', emoji: '✏️', label: 'Iné' },
     ] },
 };
 
@@ -80,6 +94,41 @@ const computeStatus = (trip) => {
     if (today < trip.startDate) return 'planned';
     if (today > trip.endDate) return 'completed';
     return 'live';
+};
+
+const computeDefaultStartTime = (dayId) => {
+    const activities = Storage.activities
+        .filter(a => a.dayId === dayId)
+        .sort((a, b) => (a.endTime || a.startTime).localeCompare(b.endTime || b.startTime));
+
+    if (activities.length === 0) return '09:00';
+
+    const lastActivity = activities[activities.length - 1];
+    const endTime = lastActivity.endTime || lastActivity.startTime;
+    const [h, m] = endTime.split(':').map(Number);
+
+    let newMin = m + 30;
+    let newHour = h;
+    if (newMin >= 60) {
+        newHour = (newHour + 1) % 24;
+        newMin -= 60;
+    }
+
+    return `${String(newHour).padStart(2, '0')}:${String(newMin).padStart(2, '0')}`;
+};
+
+const loadCustomTypes = () => {
+    const stored = localStorage.getItem('nacesty.customTypes');
+    return stored ? JSON.parse(stored) : {};
+};
+
+const saveCustomType = (category, name) => {
+    const custom = loadCustomTypes();
+    if (!custom[category]) custom[category] = [];
+    if (!custom[category].includes(name)) {
+        custom[category].push(name);
+        localStorage.setItem('nacesty.customTypes', JSON.stringify(custom));
+    }
 };
 
 const tripStats = (tripId) => {
@@ -296,6 +345,8 @@ function renderActivity(a) {
                     <span class="activity__title">${escapeHtml(a.title)}</span>
                 </div>
                 ${a.description ? `<div class="activity__desc">${escapeHtml(a.description)}</div>` : ''}
+                ${a.amount ? `<div class="activity__amount">€ ${a.amount.toFixed(2)}</div>` : ''}
+                ${a.location ? `<div class="activity__location">📍 ${escapeHtml(a.location)}</div>` : ''}
                 ${a.isCompleted ? `
                     <div class="activity__rating">
                         ${['bad', 'ok', 'good'].map(r => `
@@ -441,10 +492,10 @@ function bindCreateTripForm() {
 
 /* ---------- Wizard pridania aktivity ---------- */
 const Wizard = {
-    state: { step: 1, category: null, type: null },
+    state: { step: 1, category: null, type: null, dayId: null },
 
     reset() {
-        this.state = { step: 1, category: null, type: null };
+        this.state = { step: 1, category: null, type: null, dayId: getQuery('day') };
         this.render();
     },
 
@@ -469,6 +520,7 @@ const Wizard = {
             `;
         } else if (this.state.step === 2) {
             const cat = CATEGORIES[this.state.category];
+            const customTypes = loadCustomTypes()[this.state.category] || [];
             $('#wizard-title', m).textContent = `${cat.emoji} ${cat.label} — typ`;
             body.innerHTML = `
                 <div class="tile-grid">
@@ -476,6 +528,12 @@ const Wizard = {
                         <button type="button" class="tile" data-wizard-type="${t.id}">
                             <span class="tile__emoji">${t.emoji}</span>
                             <span class="tile__label">${t.label}</span>
+                        </button>
+                    `).join('')}
+                    ${customTypes.map(name => `
+                        <button type="button" class="tile tile--custom" data-wizard-type="custom:${name}">
+                            <span class="tile__emoji">✏️</span>
+                            <span class="tile__label">${escapeHtml(name)}</span>
                         </button>
                     `).join('')}
                 </div>
@@ -509,12 +567,40 @@ const Wizard = {
                         <label class="field__label" for="act-desc">Poznámka</label>
                         <textarea class="field__textarea" id="act-desc" name="description" placeholder="napr. vstupenka 15€, treba rezervovať"></textarea>
                     </div>
+                    <div class="field">
+                        <label class="field__label" for="act-amount">Suma (EUR)</label>
+                        <input class="field__input" id="act-amount" type="number" name="amount" placeholder="0.00" min="0" max="9999.99" step="0.01">
+                    </div>
+                    <div class="field">
+                        <label class="field__label" for="act-location">Umiestnenie</label>
+                        <input class="field__input" id="act-location" name="location" placeholder="napr. Koloseum, Rím" maxlength="160">
+                    </div>
                     <div class="btn-row">
                         <button type="button" class="btn btn--ghost" data-wizard-back>← Späť</button>
                         <button type="submit" class="btn btn--primary">Uložiť</button>
                     </div>
                 </form>
             `;
+
+            // Set default startTime + auto-set endTime when startTime changes
+            const startInput = $('#act-start', body);
+            const endInput = $('#act-end', body);
+            if (startInput && endInput && this.state.dayId) {
+                const defaultStart = computeDefaultStartTime(this.state.dayId);
+                startInput.value = defaultStart;
+                const [h, m] = defaultStart.split(':').map(Number);
+                const endHour = (h + 1) % 24;
+                endInput.value = `${String(endHour).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            }
+            if (startInput && endInput) {
+                startInput.addEventListener('change', () => {
+                    if (startInput.value) {
+                        const [h, m] = startInput.value.split(':').map(Number);
+                        const endHour = (h + 1) % 24;
+                        endInput.value = `${String(endHour).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                    }
+                });
+            }
         }
     },
 
@@ -541,17 +627,42 @@ document.addEventListener('submit', (e) => {
     const fd = new FormData(e.target);
     const dayId = getQuery('day');
     const cat = CATEGORIES[Wizard.state.category];
-    const type = cat.types.find(t => t.id === Wizard.state.type);
+    const title = fd.get('title').trim();
 
+    // Validate title for "ine" type
+    if ((Wizard.state.type === 'ine' || Wizard.state.type.startsWith('custom:')) && !title) {
+        alert('Prosím, napíš názov aktivity');
+        return;
+    }
+
+    let type = cat.types.find(t => t.id === Wizard.state.type);
+    let typeId = Wizard.state.type;
+
+    // Handle "ine" type - save as custom
+    if (Wizard.state.type === 'ine') {
+        saveCustomType(Wizard.state.category, title);
+        typeId = `custom:${title}`;
+        type = { emoji: '✏️', label: title };
+    } else if (Wizard.state.type.startsWith('custom:')) {
+        // Handle saved custom type
+        const customName = Wizard.state.type.substring(7);
+        typeId = `custom:${customName}`;
+        type = { emoji: '✏️', label: customName };
+    }
+
+    const amount = fd.get('amount') ? parseFloat(fd.get('amount')) : null;
+    const location = (fd.get('location') || '').trim() || null;
     Storage.activities.create({
         dayId,
         category: Wizard.state.category,
-        type: Wizard.state.type,
+        type: typeId,
         typeEmoji: type.emoji,
         startTime: fd.get('startTime'),
         endTime: fd.get('endTime') || null,
-        title: fd.get('title').trim(),
+        title: title,
         description: (fd.get('description') || '').trim(),
+        amount: amount,
+        location: location,
         isCompleted: false,
         rating: null,
         orderIndex: Storage.activities.filter(a => a.dayId === dayId).length,
