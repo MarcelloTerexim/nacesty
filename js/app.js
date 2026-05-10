@@ -131,13 +131,23 @@ const saveCustomType = (category, name) => {
     }
 };
 
-const tripStats = (tripId) => {
-    const days = Storage.days.filter(d => d.tripId === tripId);
-    const dayIds = new Set(days.map(d => d.id));
-    const acts = Storage.activities.filter(a => dayIds.has(a.dayId));
-    const photos = Storage.photos.filter(p => p.tripId === tripId);
-    const done = acts.filter(a => a.isCompleted).length;
-    return { days: days.length, activities: acts.length, photos: photos.length, doneActivities: done };
+const tripStats = async (tripId) => {
+    const trips = await API.trips.all();
+    const activities = await API.activities.all();
+    const photos = await API.photos.all?.() || [];
+
+    const trip = trips.find(t => t.id === tripId);
+    if (!trip) return { days: 0, activities: 0, photos: 0, doneActivities: 0 };
+
+    const acts = activities.filter(a => a.trip_id === tripId);
+    const done = acts.filter(a => a.is_completed).length;
+
+    return {
+        days: trip.daysCount || 0,
+        activities: acts.length,
+        photos: photos.filter(p => p.trip_id === tripId).length,
+        doneActivities: done
+    };
 };
 
 /* ---------- Modal ---------- */

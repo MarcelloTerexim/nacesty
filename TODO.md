@@ -1,8 +1,13 @@
-# TODO — Fáza 1 (Frontend prototyp)
+# TODO — NA CESTY Project
 
-> Mock dáta v `localStorage`, žiadny backend, mobile-first, moderný štýl, emoji ikony, **iba slovenčina**.
+**Stav projektu: Phase 2 ✅ HOTOVÁ**
 
-**Stav: ✅ HOTOVA — Fáza 1 + CSS Refactor IMPLEMENTOVANÉ A COMMITÉ.**
+| Fáza | Obsah | Stav |
+|------|-------|------|
+| **Phase 1** | Frontend prototyp (HTML/CSS/JS + localStorage) | ✅ HOTOVÁ |
+| **Phase 2** | Backend + MariaDB + PHP API | ✅ HOTOVÁ |
+| **Phase 2.5** | API Integrácia (aplikácia → DB) | ⏳ NAPLÁNOVANÉ |
+| **Phase 3** | Pokročilé funkcie (EXIF, POI, počasie) | ⏳ BUDÚCNOSŤ |
 
 ## 🛠️ Setup
 

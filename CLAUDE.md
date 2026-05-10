@@ -17,42 +17,71 @@ Plná špecifikácia: `tripflow_prirucka.docx` v koreni projektu.
 
 | Fáza | Obsah | Stav |
 |------|-------|------|
-| **1. Frontend prototyp** | UI, mock dáta v `localStorage`, žiadny backend | ✅ HOTOVÁ |
-| **2. Backend + DB + MVP** | PHP API, MariaDB, JWT auth, upload fotiek | ⚪ čaká |
-| **3. Pokročilé funkcie** | Auto-priraďovanie fotiek (EXIF/GPS), POI (OSM), počasie, report PDF | ⚪ čaká |
+| **1. Frontend prototyp** | UI, mock dáta v `localStorage`, žiadny backend | ✅ HOTOVÁ (2026-05-10) |
+| **2. Backend + DB + MVP** | PHP API, MariaDB, CRUD endpointy, photo upload endpoint | ✅ HOTOVÁ (2026-05-10) |
+| **2.5 API Integrácia** | Zmena Storage → API v app.js, aplikácia → DB zápis | ⏳ NAPLÁNOVANÉ |
+| **3. Pokročilé funkcie** | Auto-priraďovanie fotiek (EXIF/GPS), POI (OSM), počasie, report PDF | ⏳ BUDÚCNOSŤ |
 
 ## Štruktúra projektu
 
 ```
-C:\www\nacesty\
-├── index.html            Home — zoznam výletov
-├── trip.html             Detail výletu (zoznam dní)
-├── day.html              Timeline dňa
+C:\xampp\htdocs\nacesty\
+├── index.php             Home — zoznam výletov (PHP)
+├── trip.php              Detail výletu (PHP)
+├── day.php               Timeline dňa (PHP)
+├── config.php            Databázová konekcia (PDO)
+├── seed.php              Seeding demo dát
 ├── css/
-│   └── style.css         globálne štýly + design tokens
+│   └── style.css         Globálne štýly + design tokens
 ├── js/
-│   ├── app.js            UI logika, event handlers, router
+│   ├── app.js            UI logika, event handlers
 │   ├── storage.js        localStorage CRUD wrapper
-│   └── mock-data.js      sample výlety pri prvom spustení
-├── assets/
-│   └── icons/
-│       └── logo.svg      placeholder logo (gradient + 🧭)
-├── CLAUDE.md             tento súbor
-├── TODO.md               zoznam úloh
-└── tripflow_prirucka.docx
+│   └── mock-data.js      Sample výlety (Phase 1)
+├── api/
+│   ├── trips.php         REST: GET/POST/PUT/DELETE trips
+│   ├── activities.php    REST: GET/POST/PUT/DELETE activities
+│   └── photos.php        REST: POST upload, GET, DELETE photos
+├── photos/               Upload priečinok (pre fotky)
+├── CLAUDE.md             Tento súbor
+├── TODO.md               Zoznam úloh
+└── PHASE2_SETUP.md       Phase 2 dokumentácia
 ```
 
-Vo fáze 2 sa pridá: `includes/` (PHP partials), `api/` (REST endpointy), `db/` (schéma + migrácie), `.htaccess`.
+**Phase 2 stav:**
+- ✅ `config.php` — PDO konekcia na MariaDB
+- ✅ `api/` — 3x REST endpointy (CRUD)
+- ✅ MariaDB `nacesty_db` s tabuľkami (users, trips, days, activities, photos, custom_types)
+- ✅ Demo dáta v DB (seed.php)
+- ✅ HTML → PHP konverzia (index.php, trip.php, day.php)
 
-## Lokálne spustenie (fáza 1)
+## Lokálne spustenie
 
-Fáza 1 je čisté HTML/CSS/JS — žiadny server netreba. Stačí dvojklik na `index.html` v prieskumníkovi (otvorí sa cez `file://`).
+### Prerequisites
+1. **XAMPP** so Apache + PHP 8.2+ + MariaDB
+2. **MariaDB** — databáza `nacesty_db` vytvorená (schéma sql)
 
-Ak preferuješ HTTP, ľubovoľný statický server stačí — napríklad cez VS Code rozšírenie „Live Server".
+### Startup
+```bash
+# 1. Spusti XAMPP Control Panel
+# 2. Klikni Start pri Apache a MySQL
+# 3. Otvri v prehliadači:
+http://localhost/nacesty/index.php
+```
 
-**Vo fáze 2** sa `.html` súbory premenia na `.php`, pridajú sa includes (header/footer/nav) a backend pripojenie na MariaDB.
+### Seed demo dáta
+```
+http://localhost/nacesty/seed.php
+```
+Vytvorí demo user a sample trip v DB.
 
-**Reset dát:** v DevTools konzole `Storage.reset(); location.reload();` — sample dáta sa vygenerujú znova.
+### Test API
+```
+http://localhost/nacesty/api/trips.php
+```
+Mal by si vidieť JSON s tripmi z DB.
+
+### Reset dát (localStorage)
+V DevTools konzole: `Storage.reset(); location.reload();`
 
 ## Konvencie pre fázu 1
 
