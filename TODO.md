@@ -2,7 +2,7 @@
 
 > Mock dáta v `localStorage`, žiadny backend, mobile-first, moderný štýl, emoji ikony, **iba slovenčina**.
 
-**Stav: ✅ HOTOVA — Fáza 1.1 + 1.2 + 1.3 + 1.4a IMPLEMENTOVANÉ A OTESTOVANÉ.**
+**Stav: ✅ HOTOVA — Fáza 1 + CSS Refactor IMPLEMENTOVANÉ A COMMITÉ.**
 
 ## 🛠️ Setup
 
@@ -53,6 +53,35 @@
 - [x] Krok 2 — typ (variabilne, podľa kategórie)
 - [x] Krok 3 — formulár (názov, čas od/do, poznámka)
 - [x] Progress bar krokov, tlačidlá Späť
+
+## ✨ CSS REFACTOR — DESIGN UPDATE (✅ HOTOVÁ)
+
+Zmena dizajnu podľa profesionálnych návrhov (screen1, screen2):
+
+### Header & Design Tokens
+- [x] Zmena header farby zo gradientu na solid #2d7a8f (medium tealova)
+- [x] Pridané design tokeny: `--color-header`, `--color-header-light`
+- [x] Aktualizovanie hover stavov pre header prvky
+
+### Hero sekcia
+- [x] Nová hero sekcia s background imagom (Unsplash placeholder)
+- [x] Gradient overlay rgba(0,0,0,0.3) na fotografii
+- [x] Responsive výšky: 200px (mobile), 300px (tablet), 400px (desktop)
+- [x] Dynamické naplnenie hero textu (trip/day info)
+- [x] Implementácia na `day.html` a `trip.html`
+
+### Responsive Layout (Mobile-First)
+- [x] **Mobile (360-414px)**: 1-stĺpcový layout (dni + timeline + panel stack)
+- [x] **Tablet (768px)**: 2-stĺpcový layout (dni + timeline side-by-side)
+- [x] **Desktop (1024px)**: 3-stĺpcový layout (dni | timeline | panel)
+- [x] CSS grid `#day-detail` s breakpointami
+- [x] Generovanie dní zoznamu v `renderDay()`
+- [x] Zvýraznenie aktívneho dňa (`.day-card--active`)
+
+### Timeline Activity Items
+- [x] Zväčšenie ikony z 22px na 36px (40px container)
+- [x] Nové štýly pre action buttons (`.activity__action-btn`)
+- [x] Veľkosť action buttons: 32×32px
 
 ## ✨ FÁZA 1.1 + 1.2 + 1.3 + 1.4a — ROZŠÍRENÉ FUNKCIE (✅ HOTOVÉ)
 
