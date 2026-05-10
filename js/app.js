@@ -331,12 +331,9 @@ function renderHome() {
                     </div>
                     <div class="trip-card__head-actions">
                         <span class="badge badge--${t.status}">${STATUS_LABEL[t.status]}</span>
-                        <label class="trip-card__archive-label">
-                            <input type="checkbox" class="trip-card__archive-checkbox"
-                                   data-trip-id="${t.id}"
-                                   ${t.status === 'completed' ? 'checked' : ''}
-                                   aria-label="Archivovať">
-                        </label>
+                        <button class="trip-card__archive-btn" data-trip-id="${t.id}" aria-label="Archivovať" title="${t.status === 'completed' ? 'Vrátiť z archívu' : 'Presunúť do archívu'}">
+                            ${t.status === 'completed' ? '📁' : '📌'}
+                        </button>
                     </div>
                 </div>
                 <div class="trip-card__dates">📅 ${fmtDateRange(t.startDate, t.endDate)} · ${t.daysCount} ${t.daysCount === 1 ? 'deň' : (t.daysCount < 5 ? 'dni' : 'dní')}</div>
@@ -601,9 +598,27 @@ document.addEventListener('click', (e) => {
     }
 });
 
-/* ---------- Archive trip (home + trip detail) ---------- */
+/* ---------- Archive trip (home page button + trip detail checkbox) ---------- */
+// Home page: archive button
+document.addEventListener('click', (e) => {
+    const archiveBtn = e.target.closest('.trip-card__archive-btn');
+    if (!archiveBtn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    const tripId = archiveBtn.dataset.tripId;
+    const trip = Storage.trips.find(t => t.id === tripId);
+    if (!trip) return;
+
+    const newStatus = trip.status === 'completed' ? 'planned' : 'completed';
+    Storage.trips.update(tripId, { status: newStatus });
+    renderHome();
+});
+
+// Trip detail: archive checkbox (if exists)
 document.addEventListener('change', (e) => {
-    if (!e.target.classList.contains('trip-card__archive-checkbox') && e.target.id !== 'archive-trip') return;
+    if (e.target.id !== 'archive-trip') return;
 
     e.preventDefault();
     e.stopPropagation();
@@ -615,12 +630,7 @@ document.addEventListener('change', (e) => {
 
     const newStatus = archiveCheckbox.checked ? 'completed' : 'planned';
     Storage.trips.update(tripId, { status: newStatus });
-
-    if (document.body.dataset.page === 'home') {
-        renderHome();
-    } else if (document.body.dataset.page === 'trip') {
-        window.location.href = 'index.html';
-    }
+    window.location.href = 'index.html';
 });
 
 /* ---------- Photo upload ---------- */
