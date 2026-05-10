@@ -177,12 +177,12 @@ h3 { font-size: var(--fs-base); }
 /* ---------- Hero sekcia ---------- */
 .hero {
     position: relative;
-    min-height: 200px;
+    min-height: 150px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
     margin: 0 calc(var(--sp-4) * -1);
     margin-top: 0;
@@ -192,7 +192,7 @@ h3 { font-size: var(--fs-base); }
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.5));
     z-index: 1;
 }
 .hero__content {
@@ -200,31 +200,50 @@ h3 { font-size: var(--fs-base); }
     z-index: 2;
     text-align: center;
     color: #fff;
-    padding: var(--sp-5);
+    padding: var(--sp-4);
+    padding-bottom: var(--sp-5);
 }
 .hero__title {
-    font-size: var(--fs-2xl);
+    font-size: var(--fs-xl);
     font-weight: 700;
-    margin-bottom: var(--sp-2);
+    margin-bottom: var(--sp-1);
     line-height: 1.2;
 }
 .hero__meta {
     font-size: var(--fs-sm);
     opacity: 0.95;
+    margin-bottom: var(--sp-3);
+}
+.hero__info {
+    display: flex;
+    gap: var(--sp-4);
+    justify-content: center;
+    flex-wrap: wrap;
+    font-size: var(--fs-xs);
+    opacity: 0.9;
+}
+.hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-1);
+    padding: 4px var(--sp-2);
+    border-radius: var(--r-full);
+    font-size: var(--fs-xs);
+    font-weight: 600;
 }
 
 @media (min-width: 768px) {
     .hero {
-        min-height: 300px;
+        min-height: 160px;
     }
     .hero__title {
-        font-size: 32px;
+        font-size: var(--fs-2xl);
     }
 }
 
 @media (min-width: 1024px) {
     .hero {
-        min-height: 400px;
+        min-height: 180px;
     }
 }
 
@@ -620,56 +639,85 @@ h3 { font-size: var(--fs-base); }
 
 /* ---------- Day detail layout ---------- */
 #day-detail {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--sp-5);
-}
-
-.days-list {
-    order: 1;
     display: flex;
     flex-direction: column;
-    gap: var(--sp-3);
+    gap: 0;
+}
+
+/* Days strip - horizontálny pás filmových okienok */
+.days-list {
+    display: flex;
+    gap: var(--sp-2);
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: var(--sp-4);
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+}
+.days-list::-webkit-scrollbar {
+    height: 4px;
+}
+.days-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+.days-list::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--r-full);
+}
+
+.day-card {
+    display: block;
+    background: var(--color-surface-2);
+    border-radius: var(--r-lg);
+    padding: var(--sp-3);
+    box-shadow: var(--shadow-sm);
+    border: 2px solid var(--color-border);
+    transition: all 160ms ease;
+    flex: 0 0 auto;
+    min-width: 120px;
+    text-align: center;
+    cursor: pointer;
+}
+.day-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    outline: none;
+}
+.day-card--active {
+    background: var(--gradient-primary-soft);
+    border-color: var(--color-primary-1);
+    box-shadow: var(--shadow-md);
+}
+
+.day-card__title-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    flex-wrap: wrap;
+    min-width: 0;
+    justify-content: center;
+}
+.day-card__title {
+    font-weight: 700;
+    font-size: var(--fs-sm);
+}
+.day-card__date {
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+}
+
+.day-card__stats {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
 }
 
 .timeline-container {
-    order: 2;
-}
-
-.day-panel {
-    order: 3;
-}
-
-@media (min-width: 768px) {
-    #day-detail {
-        grid-template-columns: 1fr 2fr;
-    }
-    .days-list {
-        order: 1;
-    }
-    .timeline-container {
-        order: 2;
-    }
-    .day-panel {
-        display: none;
-    }
-}
-
-@media (min-width: 1024px) {
-    #day-detail {
-        grid-template-columns: 240px 1fr 280px;
-    }
-    .days-list {
-        order: 1;
-        gap: var(--sp-2);
-    }
-    .timeline-container {
-        order: 2;
-    }
-    .day-panel {
-        order: 3;
-        display: block;
-    }
+    flex: 1;
+    padding: var(--sp-4);
 }
 
 /* ---------- Timeline (deň) ---------- */

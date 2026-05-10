@@ -236,29 +236,20 @@ function renderTrip() {
     $('#nav-title').textContent = trip.name;
     $('#nav-subtitle').textContent = trip.destination;
 
-    // Aktualizovať hero sekciu
+    // Aktualizovať hero sekciu s trip infom
     $('#hero-title').textContent = trip.name;
-    $('#hero-date').textContent = `${trip.destination} · ${fmtDateRange(trip.startDate, trip.endDate)}`;
+    $('#hero-destination').textContent = trip.destination;
 
     const s = tripStats(trip.id);
     const progress = s.activities ? Math.round((s.doneActivities / s.activities) * 100) : 0;
 
-    $('#trip-detail').innerHTML = `
-        <section class="trip-hero">
-            <h1 class="trip-hero__name">${escapeHtml(trip.name)}</h1>
-            <div class="trip-hero__meta">
-                <span>📍 ${escapeHtml(trip.destination)}</span>
-                <span>📅 ${fmtDateRange(trip.startDate, trip.endDate)}</span>
-                <span class="badge badge--${trip.status}">${STATUS_LABEL[trip.status]}</span>
-            </div>
-            <div class="trip-hero__progress" aria-label="Postup výletu">
-                <div class="trip-hero__progress-bar" style="width: ${progress}%"></div>
-            </div>
-            <div class="trip-hero__progress-label">${s.doneActivities}/${s.activities} hotových aktivít · ${progress}%</div>
-        </section>
-
-        <div class="list" id="days-list"></div>
+    $('#hero-info').innerHTML = `
+        <span>📅 ${fmtDateRange(trip.startDate, trip.endDate)}</span>
+        <span class="hero__badge badge badge--${trip.status}">${STATUS_LABEL[trip.status]}</span>
+        <span>✓ ${s.doneActivities}/${s.activities} (${progress}%)</span>
     `;
+
+    $('#trip-detail').innerHTML = `<div class="list" id="days-list"></div>`;
 
     const days = Storage.days
         .filter(d => d.tripId === trip.id)
@@ -315,9 +306,19 @@ function renderDay() {
     $('#nav-subtitle').textContent = `${fmtDate(day.date)} · ${day.weatherEmoji} ${day.weatherTemp}°C ${day.weatherSummary}`;
     $('#nav-back-link').href = `trip.html?id=${encodeURIComponent(tripId)}`;
 
-    // Aktualizovať hero sekciu
-    $('#hero-title').textContent = `${trip.name}`;
-    $('#hero-date').textContent = `Deň ${day.dayIndex} · ${fmtDate(day.date)}`;
+    // Aktualizovať hero sekciu s trip infom
+    $('#hero-title').textContent = trip.name;
+    $('#hero-destination').textContent = trip.destination;
+
+    const s = tripStats(trip.id);
+    const progress = s.activities ? Math.round((s.doneActivities / s.activities) * 100) : 0;
+    const tripStatus = computeStatus(trip);
+
+    $('#hero-info').innerHTML = `
+        <span>📅 ${fmtDateRange(trip.startDate, trip.endDate)}</span>
+        <span class="hero__badge badge badge--${tripStatus}">${STATUS_LABEL[tripStatus]}</span>
+        <span>✓ ${s.doneActivities}/${s.activities} (${progress}%)</span>
+    `;
 
     const acts = Storage.activities
         .filter(a => a.dayId === day.id)
@@ -325,7 +326,7 @@ function renderDay() {
 
     const container = $('#day-detail');
 
-    // Generovať zoznam dní
+    // Generovať zoznam dní v horizontálnom páse
     const days = Storage.days
         .filter(d => d.tripId === trip.id)
         .sort((a, b) => a.dayIndex - b.dayIndex);
@@ -340,9 +341,9 @@ function renderDay() {
             <a href="day.html?trip=${encodeURIComponent(trip.id)}&day=${encodeURIComponent(d.id)}" class="day-card ${isActive ? 'day-card--active' : ''}">
                 <div class="day-card__title-row">
                     <span class="day-card__title">Deň ${d.dayIndex}</span>
-                    <span class="day-card__date">${fmtDate(d.date)}</span>
                 </div>
-                ${daysActs.length ? `<div class="day-card__stats"><span>✓ ${done}/${daysActs.length}</span></div>` : ''}
+                <div class="day-card__date">${fmtDate(d.date)}</div>
+                ${daysActs.length ? `<div class="day-card__stats">✓ ${done}/${daysActs.length}</div>` : ''}
             </a>
         `;
     }).join('');
