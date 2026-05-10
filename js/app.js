@@ -323,26 +323,28 @@ function renderHome() {
     list.innerHTML = trips.map(t => {
         const s = tripStats(t.id);
         return `
-            <a href="trip.html?id=${encodeURIComponent(t.id)}" class="trip-card">
-                <div class="trip-card__head">
-                    <div>
-                        <div class="trip-card__name">${escapeHtml(t.name)}</div>
-                        ${t.destination ? `<div class="trip-card__destination">${escapeHtml(t.destination)}</div>` : ''}
+            <div class="trip-card-wrapper">
+                <a href="trip.html?id=${encodeURIComponent(t.id)}" class="trip-card">
+                    <div class="trip-card__head">
+                        <div>
+                            <div class="trip-card__name">${escapeHtml(t.name)}</div>
+                            ${t.destination ? `<div class="trip-card__destination">${escapeHtml(t.destination)}</div>` : ''}
+                        </div>
+                        <div class="trip-card__head-actions">
+                            <span class="badge badge--${t.status}">${STATUS_LABEL[t.status]}</span>
+                        </div>
                     </div>
-                    <div class="trip-card__head-actions">
-                        <span class="badge badge--${t.status}">${STATUS_LABEL[t.status]}</span>
-                        <button class="trip-card__archive-btn" data-trip-id="${t.id}" aria-label="Archivovať" title="${t.status === 'completed' ? 'Vrátiť z archívu' : 'Presunúť do archívu'}">
-                            ${t.status === 'completed' ? '📁' : '📌'}
-                        </button>
+                    <div class="trip-card__dates">📅 ${fmtDateRange(t.startDate, t.endDate)} · ${t.daysCount} ${t.daysCount === 1 ? 'deň' : (t.daysCount < 5 ? 'dni' : 'dní')}</div>
+                    <div class="trip-card__stats">
+                        <span class="trip-card__stat">📍 ${s.activities} ${s.activities === 1 ? 'aktivita' : (s.activities < 5 ? 'aktivity' : 'aktivít')}</span>
+                        <span class="trip-card__stat">📷 ${s.photos}</span>
+                        ${t.status === 'live' ? `<span class="trip-card__stat">✓ ${s.doneActivities}/${s.activities}</span>` : ''}
                     </div>
-                </div>
-                <div class="trip-card__dates">📅 ${fmtDateRange(t.startDate, t.endDate)} · ${t.daysCount} ${t.daysCount === 1 ? 'deň' : (t.daysCount < 5 ? 'dni' : 'dní')}</div>
-                <div class="trip-card__stats">
-                    <span class="trip-card__stat">📍 ${s.activities} ${s.activities === 1 ? 'aktivita' : (s.activities < 5 ? 'aktivity' : 'aktivít')}</span>
-                    <span class="trip-card__stat">📷 ${s.photos}</span>
-                    ${t.status === 'live' ? `<span class="trip-card__stat">✓ ${s.doneActivities}/${s.activities}</span>` : ''}
-                </div>
-            </a>
+                </a>
+                <button class="trip-card__archive-btn" data-trip-id="${t.id}" aria-label="Archivovať" title="${t.status === 'completed' ? 'Vrátiť z archívu' : 'Presunúť do archívu'}">
+                    ${t.status === 'completed' ? '📁' : '📌'}
+                </button>
+            </div>
         `;
     }).join('');
 }
