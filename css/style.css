@@ -343,6 +343,23 @@ h3 { font-size: var(--fs-base); }
     align-items: center;
     gap: var(--sp-1);
 }
+.trip-card__head-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+}
+.trip-card__archive-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+.trip-card__archive-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-primary-1);
+}
 
 /* ---------- Status badge ---------- */
 .badge {
@@ -821,6 +838,13 @@ h3 { font-size: var(--fs-base); }
     border-color: transparent;
     color: #fff;
 }
+.activity__time-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2);
+    margin-bottom: var(--sp-1);
+}
 .activity__time {
     font-variant-numeric: tabular-nums;
     font-weight: 600;
@@ -829,6 +853,27 @@ h3 { font-size: var(--fs-base); }
     padding-top: 4px;
     min-width: 70px;
     text-align: center;
+}
+.activity__actions {
+    display: flex;
+    gap: var(--sp-2);
+}
+.activity__action-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--r-md);
+    transition: background-color 160ms ease;
+    opacity: 0.7;
+}
+.activity__action-btn:hover {
+    background-color: rgba(139, 92, 246, 0.1);
+    opacity: 1;
+}
+.activity__action-btn--delete:hover {
+    background-color: rgba(239, 68, 68, 0.1);
 }
 .activity__body { min-width: 0; }
 .activity__head {

@@ -329,7 +329,15 @@ function renderHome() {
                         <div class="trip-card__name">${escapeHtml(t.name)}</div>
                         ${t.destination ? `<div class="trip-card__destination">${escapeHtml(t.destination)}</div>` : ''}
                     </div>
-                    <span class="badge badge--${t.status}">${STATUS_LABEL[t.status]}</span>
+                    <div class="trip-card__head-actions">
+                        <span class="badge badge--${t.status}">${STATUS_LABEL[t.status]}</span>
+                        <label class="trip-card__archive-label">
+                            <input type="checkbox" class="trip-card__archive-checkbox"
+                                   data-trip-id="${t.id}"
+                                   ${t.status === 'completed' ? 'checked' : ''}
+                                   aria-label="Archivovať">
+                        </label>
+                    </div>
                 </div>
                 <div class="trip-card__dates">📅 ${fmtDateRange(t.startDate, t.endDate)} · ${t.daysCount} ${t.daysCount === 1 ? 'deň' : (t.daysCount < 5 ? 'dni' : 'dní')}</div>
                 <div class="trip-card__stats">
@@ -512,7 +520,13 @@ function renderActivity(a) {
     return `
         <div class="activity ${a.isCompleted ? 'activity--done' : ''}" data-activity-id="${a.id}">
             <button class="activity__check" data-act="toggle" aria-label="${a.isCompleted ? 'Odznačiť ako hotové' : 'Označiť ako hotové'}">${a.isCompleted ? '✓' : ''}</button>
-            <div class="activity__time">${timeRange}</div>
+            <div class="activity__time-row">
+                <div class="activity__time">${timeRange}</div>
+                <div class="activity__actions">
+                    <button class="activity__action-btn" data-act="edit" aria-label="Upraviť aktivitu" title="Upraviť">✏️</button>
+                    <button class="activity__action-btn activity__action-btn--delete" data-act="delete" aria-label="Zmazať aktivitu" title="Zmazať">🗑️</button>
+                </div>
+            </div>
             <div class="activity__body">
                 <div class="activity__head">
                     <span class="activity__icon">${a.typeEmoji}</span>
@@ -572,6 +586,14 @@ document.addEventListener('click', (e) => {
         rerenderCurrent();
     } else if (action === 'add-photo') {
         triggerPhotoUpload(actId);
+    } else if (action === 'delete') {
+        if (confirm('Odstrániť aktivitu?')) {
+            Storage.activities.remove(actId);
+            rerenderCurrent();
+        }
+    } else if (action === 'edit') {
+        // TODO: Implementovať úpravu aktivity v budúcnosti
+        alert('Úprava aktivít bude dostupná v ďalšej verzii');
     }
 });
 
@@ -587,10 +609,12 @@ document.addEventListener('click', (e) => {
     }
 });
 
-/* ---------- Archive trip ---------- */
+/* ---------- Archive trip (home + trip detail) ---------- */
 document.addEventListener('change', (e) => {
-    const archiveCheckbox = e.target.closest('#archive-trip');
+    const archiveCheckbox = e.target.closest('.trip-card__archive-checkbox, #archive-trip');
     if (!archiveCheckbox) return;
+
+    e.stopPropagation();
 
     const tripId = archiveCheckbox.dataset.tripId;
     const trip = Storage.trips.find(t => t.id === tripId);
@@ -598,7 +622,12 @@ document.addEventListener('change', (e) => {
 
     const newStatus = archiveCheckbox.checked ? 'completed' : 'planned';
     Storage.trips.update(tripId, { status: newStatus });
-    window.location.href = 'index.html';
+
+    if (document.body.dataset.page === 'home') {
+        renderHome();
+    } else if (document.body.dataset.page === 'trip') {
+        window.location.href = 'index.html';
+    }
 });
 
 /* ---------- Photo upload ---------- */
