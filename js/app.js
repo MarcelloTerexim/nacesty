@@ -374,14 +374,6 @@ function renderTrip() {
         <span>📅 ${fmtDateRange(trip.startDate, trip.endDate)}</span>
         <span class="hero__badge badge badge--${trip.status}">${STATUS_LABEL[trip.status]}</span>
         <span>✓ ${s.doneActivities}/${s.activities} (${progress}%)</span>
-        <div class="hero__archive" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2);">
-            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
-                <input type="checkbox" class="trip-archive-checkbox" id="archive-trip"
-                       ${trip.status === 'completed' ? 'checked' : ''}
-                       data-trip-id="${trip.id}" aria-label="Archivovať výlet">
-                <span>Archivovať výlet</span>
-            </label>
-        </div>
     `;
 
     // Generovať tri pohľady (timeline, rozpočet, album)
@@ -611,11 +603,12 @@ document.addEventListener('click', (e) => {
 
 /* ---------- Archive trip (home + trip detail) ---------- */
 document.addEventListener('change', (e) => {
-    const archiveCheckbox = e.target.closest('.trip-card__archive-checkbox, #archive-trip');
-    if (!archiveCheckbox) return;
+    if (!e.target.classList.contains('trip-card__archive-checkbox') && e.target.id !== 'archive-trip') return;
 
+    e.preventDefault();
     e.stopPropagation();
 
+    const archiveCheckbox = e.target;
     const tripId = archiveCheckbox.dataset.tripId;
     const trip = Storage.trips.find(t => t.id === tripId);
     if (!trip) return;
