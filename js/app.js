@@ -393,34 +393,7 @@ function renderTrip() {
     // Generovať tri pohľady (timeline, rozpočet, album)
     const days = Storage.days.filter(d => d.tripId === trip.id).sort((a, b) => a.dayIndex - b.dayIndex);
 
-    let timelineHtml = '<div class="timeline-view active"><div class="list" id="days-list">';
-
-    days.forEach(d => {
-        const acts = Storage.activities
-            .filter(a => a.dayId === d.id)
-            .sort((a, b) => a.startTime.localeCompare(b.startTime));
-        const done = acts.filter(a => a.isCompleted).length;
-
-        timelineHtml += `
-            <a href="day.html?trip=${encodeURIComponent(trip.id)}&day=${encodeURIComponent(d.id)}" class="day-card">
-                <div class="day-card__title-row">
-                    <span class="day-card__title">Deň ${d.dayIndex}</span>
-                    <span class="day-card__date">${fmtDate(d.date)}</span>
-                </div>
-                ${acts.length ? `<div class="day-card__stats">✓ ${done}/${acts.length}</div>` : ''}
-            </a>
-        `;
-    });
-
-    timelineHtml += '</div></div>';
-
-    $('#trip-detail').innerHTML = timelineHtml + renderBudgetView(trip.id, null) + renderAlbumView(trip.id);
-
-    const days = Storage.days
-        .filter(d => d.tripId === trip.id)
-        .sort((a, b) => a.dayIndex - b.dayIndex);
-
-    $('#days-list').innerHTML = days.map(d => {
+    const daysHtml = days.map(d => {
         const acts = Storage.activities
             .filter(a => a.dayId === d.id)
             .sort((a, b) => a.startTime.localeCompare(b.startTime));
@@ -454,6 +427,9 @@ function renderTrip() {
             </a>
         `;
     }).join('');
+
+    const timelineHtml = `<div class="timeline-view active"><div class="list" id="days-list">${daysHtml}</div></div>`;
+    $('#trip-detail').innerHTML = timelineHtml + renderBudgetView(trip.id, null) + renderAlbumView(trip.id);
 }
 
 function renderDay() {
