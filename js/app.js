@@ -193,7 +193,7 @@ function renderBudgetView(tripId, dayId) {
         return d && d.tripId === tripId;
     });
 
-    let html = '<div class="budget-view active">';
+    let html = '<div class="budget-view">';
 
     // Rozpočet po dňoch
     days.forEach(d => {
@@ -260,7 +260,7 @@ function renderAlbumView(tripId) {
     if (!trip) return '<div class="empty">Chyba: Výlet sa nenašiel</div>';
 
     const days = Storage.days.filter(d => d.tripId === tripId).sort((a, b) => a.dayIndex - b.dayIndex);
-    let html = '<div class="album-view active">';
+    let html = '<div class="album-view">';
 
     days.forEach(d => {
         const photos = Storage.photos.filter(p => {
@@ -366,29 +366,15 @@ function renderTrip() {
         <span>📅 ${fmtDateRange(trip.startDate, trip.endDate)}</span>
         <span class="hero__badge badge badge--${trip.status}">${STATUS_LABEL[trip.status]}</span>
         <span>✓ ${s.doneActivities}/${s.activities} (${progress}%)</span>
+        <div class="hero__archive" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px;">
+                <input type="checkbox" class="trip-archive-checkbox" id="archive-trip"
+                       ${trip.status === 'completed' ? 'checked' : ''}
+                       data-trip-id="${trip.id}" aria-label="Archivovať výlet">
+                <span>Archivovať výlet</span>
+            </label>
+        </div>
     `;
-
-    // Trip header box s archivovacím poľom
-    const headerBox = $('#trip-header-box');
-    if (headerBox) {
-        headerBox.innerHTML = `
-            <div class="trip-header-content">
-                <div class="trip-info">
-                    <div class="trip-info-name">${escapeHtml(trip.name)}</div>
-                    <div class="trip-info-meta">
-                        <span>📍 ${escapeHtml(trip.destination)}</span>
-                        <span class="badge badge--${trip.status}">${STATUS_LABEL[trip.status]}</span>
-                    </div>
-                </div>
-                <div class="trip-archive-section">
-                    <input type="checkbox" class="trip-archive-checkbox" id="archive-trip"
-                           ${trip.status === 'completed' ? 'checked' : ''}
-                           data-trip-id="${trip.id}" aria-label="Archivovať výlet">
-                    <label class="trip-archive-label" for="archive-trip">Archivovať</label>
-                </div>
-            </div>
-        `;
-    }
 
     // Generovať tri pohľady (timeline, rozpočet, album)
     const days = Storage.days.filter(d => d.tripId === trip.id).sort((a, b) => a.dayIndex - b.dayIndex);

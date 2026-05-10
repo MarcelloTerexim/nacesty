@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Console</title>
+</head>
+<body>
+<h1>Test Console for Na cesty</h1>
+<pre id="output"></pre>
+
+<script src="js/storage.js"></script>
+<script src="js/mock-data.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+// Test that everything loaded correctly
+const output = document.getElementById('output');
+let log = '';
+
+try {
+    log += 'Storage object: ' + (typeof Storage) + '\n';
+    log += 'MockData object: ' + (typeof MockData) + '\n';
+    log += 'renderHome function: ' + (typeof renderHome) + '\n';
+    log += '\n';
+
+    // Check if data was seeded
+    const trips = Storage.trips.all();
+    log += 'Trips in storage: ' + trips.length + '\n';
+
+    if (trips.length > 0) {
+        log += 'First trip: ' + trips[0].name + '\n';
+        log += '\n✓ SUCCESS: Data seeded correctly\n';
+    } else {
+        log += '\n✗ ERROR: No trips found in storage\n';
+    }
+
+    // Test renderHome
+    log += '\nTesting renderHome...\n';
+    const body = document.body;
+    body.setAttribute('data-page', 'home');
+
+    // Create mock DOM elements
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .list { border: 1px solid blue; padding: 10px; }
+        .trip-card { display: block; padding: 5px; margin: 5px; border: 1px solid gray; }
+        .empty { border: 1px solid red; padding: 10px; }
+        .badge { display: inline-block; padding: 2px 5px; }
+    `;
+    document.head.appendChild(style);
+
+    const main = document.createElement('main');
+    const tabsDiv = document.createElement('div');
+    tabsDiv.className = 'tabs';
+    tabsDiv.innerHTML = '<button class="tabs__item tabs__item--active" data-filter="active">Aktívne</button>';
+
+    const listDiv = document.createElement('div');
+    listDiv.id = 'trips-list';
+
+    const emptyDiv = document.createElement('div');
+    emptyDiv.id = 'trips-empty';
+
+    main.appendChild(tabsDiv);
+    main.appendChild(listDiv);
+    main.appendChild(emptyDiv);
+
+    body.appendChild(main);
+
+    // Call renderHome
+    renderHome();
+
+    const cardsFound = listDiv.querySelectorAll('.trip-card').length;
+    log += 'Trip cards rendered: ' + cardsFound + '\n';
+
+    if (cardsFound > 0) {
+        log += '✓ renderHome() works!\n';
+    } else {
+        log += '✗ renderHome() did not render cards\n';
+    }
+
+} catch (e) {
+    log += 'ERROR: ' + e.message + '\n';
+    log += e.stack + '\n';
+}
+
+output.textContent = log;
+</script>
+</body>
+</html>
